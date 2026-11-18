@@ -171,9 +171,9 @@ function renderSection(tab: Tab, section: Section): HTMLElement {
     'div',
     { className: 'grid' },
     ...section.tiles.map((tile) => renderTile(tile)),
-    editing ? el('button', { className: 'tile add', textContent: '+', title: 'Add a bookmark', onclick: () => addTile(section) }) : null,
+    // Always there, so adding a bookmark needs no trip to edit mode; outside edit mode it is just a faint "+".
+    el('button', { className: editing ? 'tile add' : 'tile add quiet', textContent: '+', title: 'Add a bookmark', onclick: () => addTile(section) }),
   );
-  if (!editing && section.tiles.length === 0) grid.append(el('p', { className: 'empty', textContent: 'No bookmarks yet.' }));
 
   const node = el('section', {}, heading, grid);
 

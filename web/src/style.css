@@ -393,6 +393,20 @@ button.icon:hover {
   box-shadow: none;
 }
 
+.tile.add.quiet {
+  border-color: transparent;
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--comment);
+  opacity: 0.6;
+  transition: opacity 120ms ease;
+}
+
+.tile.add.quiet:hover {
+  opacity: 1;
+  transform: none;
+}
+
 .add-section {
   margin-top: 28px;
   color: var(--dim);
