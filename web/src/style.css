@@ -246,8 +246,11 @@ h2 {
   font-weight: 600;
 }
 
+/* The title sits on its own band in the theme's surface colour, below the white image area. */
 .title {
   padding: 8px 10px;
+  background: var(--surface);
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
