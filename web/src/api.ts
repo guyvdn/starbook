@@ -54,6 +54,9 @@ export const api = {
     if (!response.ok) throw new Error(await errorOf(response));
   },
 
+  fillMissingIcons: async (slug: string) =>
+    json<Space>(await fetch(`/api/spaces/${encodeURIComponent(slug)}/missing-icons`, { method: 'POST' })),
+
   lookupIcon: async (url: string) =>
     json<IconResult>(await fetch('/api/icons', { method: 'POST', headers: jsonHeaders, body: JSON.stringify({ url }) })),
 

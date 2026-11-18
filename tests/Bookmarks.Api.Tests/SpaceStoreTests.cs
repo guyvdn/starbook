@@ -60,6 +60,20 @@ public sealed class SpaceStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task Update_applies_to_the_latest_version_so_client_edits_are_kept()
+    {
+        var store = await Open();
+        var original = store.Get("personal")!;
+        await store.SaveAsync(WithTile(original, "Edited by a client"), Ct);
+
+        var updated = await store.UpdateAsync("personal", s => s with { Name = "Renamed by the server" }, Ct);
+
+        Assert.Equal("Renamed by the server", updated!.Name);
+        Assert.Equal("Edited by a client", updated.Tabs[0].Sections[0].Tiles[0].Title);
+        Assert.Equal(original.Version + 2, updated.Version);
+    }
+
+    [Fact]
     public async Task Create_keeps_order_and_refuses_a_taken_slug()
     {
         var store = await Open();

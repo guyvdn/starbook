@@ -118,6 +118,7 @@ flowchart LR
 | `GET` | `/api/spaces/{slug}` | One space. |
 | `PUT` | `/api/spaces/{slug}` | Save a space; requires the base `version`, `409` when stale. |
 | `POST` | `/api/spaces` · `DELETE` `/api/spaces/{slug}` | Create / remove a space. |
+| `POST` | `/api/spaces/{slug}/missing-icons` | Fetch icons for every tile without an image (6 at a time) and save them onto the latest version. |
 | `POST` | `/api/icons` | Fetch the best icon and the page title for a URL; store the icon, return both. |
 | `POST` | `/api/images` | Upload or paste a custom image (raw body, max 1 MB), store it, return the image reference. |
 | `GET` | `/img/{hash}.{ext}` | Serve an image, cached as immutable, with `nosniff` and a sandboxing CSP so an SVG opened directly cannot run script. |
@@ -136,6 +137,7 @@ bookmarked.
 - **Custom image** per tile, by upload or paste, overrides the fetched one. This is how several tiles for the
   same site are told apart.
 - **Re-fetch** on demand per tile.
+- **Fetch missing icons** for a whole space, from the space menu in edit mode. Also what the import uses.
 - Images are content-addressed (`sha256`), so the same icon used by many tiles is stored once. Unreferenced
   images can be swept.
 

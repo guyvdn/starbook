@@ -97,6 +97,27 @@ public sealed class SpaceStore
         }
     }
 
+    /// <summary>
+    /// Apply a server-side change to the latest version of a space, without a version check. For background work
+    /// such as filling in icons, which must not be lost to, or overwrite, edits made in the meantime.
+    /// </summary>
+    public async Task<Space?> UpdateAsync(string slug, Func<Space, Space> change, CancellationToken ct = default)
+    {
+        await _writeLock.WaitAsync(ct);
+        try
+        {
+            if (_spaces.GetValueOrDefault(slug) is not { } current) return null;
+            var saved = change(current) with { Version = current.Version + 1 };
+            await WriteSpaceAsync(saved, ct);
+            _spaces = new Dictionary<string, Space>(_spaces, StringComparer.Ordinal) { [slug] = saved };
+            return saved;
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
+    }
+
     /// <returns>The new space, or <c>null</c> when the slug is taken.</returns>
     public async Task<Space?> CreateAsync(string slug, string name, CancellationToken ct = default)
     {

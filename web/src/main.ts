@@ -96,6 +96,7 @@ function renderSpaces(): void {
     ...others.map((s) => el('a', { href: `/s/${encodeURIComponent(s.slug)}`, className: 'space', textContent: s.name })),
     editing ? el('hr') : null,
     editing ? el('button', { className: 'space', textContent: 'Rename this space…', onclick: renameSpace }) : null,
+    editing ? el('button', { className: 'space', textContent: 'Fetch missing icons', onclick: fillMissingIcons }) : null,
     editing ? el('button', { className: 'space', textContent: 'New space…', onclick: createSpace }) : null,
     editing ? el('button', { className: 'space danger', textContent: 'Delete this space…', onclick: deleteSpace }) : null,
     ]),
@@ -421,6 +422,28 @@ async function deleteSpace(): Promise<void> {
   } catch (e) {
     toast(e instanceof Error ? e.message : String(e));
   }
+}
+
+async function fillMissingIcons(): Promise<void> {
+  const before = countImages(space);
+  toast('Fetching missing icons…');
+  try {
+    const updated = await api.fillMissingIcons(space.slug);
+    if (dirty || saving) {
+      toast('Icons fetched, but you edited meanwhile. Reload the page to see them.');
+      return;
+    }
+    space = updated;
+    render();
+    const missing = updated.tabs.reduce((n, t) => n + tileCount(t.sections), 0) - countImages(updated);
+    toast(`Found ${countImages(updated) - before} icon(s).${missing ? ` ${missing} tile(s) still have none.` : ''}`);
+  } catch (e) {
+    toast(e instanceof Error ? e.message : String(e));
+  }
+}
+
+function countImages(s: Space): number {
+  return s.tabs.flatMap((t) => t.sections).flatMap((x) => x.tiles).filter((t) => t.image).length;
 }
 
 function toggleEditing(): void {

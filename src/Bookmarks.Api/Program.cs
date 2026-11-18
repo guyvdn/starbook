@@ -9,6 +9,7 @@ var dataPath = Path.GetFullPath(builder.Configuration["DataPath"] ?? "data", bui
 builder.Services.AddSingleton(await SpaceStore.OpenAsync(dataPath));
 builder.Services.AddSingleton<StartPage>();
 builder.Services.AddSingleton(new ImageStore(dataPath));
+builder.Services.AddTransient<MissingIcons>(); // IconFetcher is a typed HttpClient: transient
 builder.Services.AddHttpClient<IconFetcher>(client =>
     {
         client.Timeout = TimeSpan.FromSeconds(8);
@@ -67,6 +68,9 @@ api.MapPut("/{slug}", async (string slug, Space space, SpaceStore store, Cancell
         _ => Results.NotFound(),
     };
 });
+
+api.MapPost("/{slug}/missing-icons", async (string slug, MissingIcons missing, CancellationToken ct) =>
+    await missing.FillAsync(slug, ct) is { } space ? Results.Ok(space) : Results.NotFound());
 
 api.MapPost("/", async (CreateSpaceRequest request, SpaceStore store, CancellationToken ct) =>
 {
