@@ -156,7 +156,8 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 ## Editing
 
-- An **Edit** button switches the page into edit mode; outside it, the page is a plain start page.
+- **Edit** is an item in the space menu (click the space name), so the start page shows no edit controls.
+  In edit mode a **Done** button appears top right, and the menu offers **Done editing**.
 - Add, edit and delete tabs, sections and tiles inline on the start page. In edit mode, clicking a tile opens
   its dialog (URL, title, image, move/copy, delete); clicking the active tab renames it.
 - Drag and drop to reorder tiles, move them between sections, and reorder sections and tabs. Dropping a tile

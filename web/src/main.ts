@@ -86,21 +86,23 @@ function render(): void {
   renderSpaces();
   renderTabs();
   renderContent();
-  byId('edit-toggle').textContent = editing ? 'Done' : 'Edit';
 }
 
 function renderSpaces(): void {
   const others = spaces.filter((s) => s.slug !== space.slug);
-  byId('switcher').classList.toggle('single', others.length === 0 && !editing);
+  // Editing starts from this menu, so the start page itself shows no edit controls.
   byId('spaces').replaceChildren(
     ...present([
     ...others.map((s) => el('a', { href: `/s/${encodeURIComponent(s.slug)}`, className: 'space', textContent: s.name })),
-    editing ? el('hr') : null,
+    others.length > 0 ? el('hr') : null,
+    !editing ? el('button', { className: 'space', textContent: 'Edit', onclick: toggleEditing }) : null,
     editing ? el('button', { className: 'space', textContent: 'Rename this space…', onclick: renameSpace }) : null,
     editing ? el('button', { className: 'space', textContent: 'Fetch missing icons', onclick: fillMissingIcons }) : null,
     editing ? el('button', { className: 'space', textContent: 'New space…', onclick: createSpace }) : null,
     editing ? el('button', { className: 'space', textContent: 'Import from Speed Dial…', onclick: startImport }) : null,
     editing ? el('button', { className: 'space danger', textContent: 'Delete this space…', onclick: deleteSpace }) : null,
+    editing ? el('hr') : null,
+    editing ? el('button', { className: 'space', textContent: 'Done editing', onclick: toggleEditing }) : null,
     ]),
   );
 }

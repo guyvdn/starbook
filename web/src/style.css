@@ -148,10 +148,6 @@ a {
   background: var(--surface);
 }
 
-.switcher.single summary {
-  pointer-events: none;
-}
-
 .spaces {
   position: absolute;
   top: calc(100% + 6px);
@@ -317,15 +313,15 @@ button.danger,
 }
 
 .edit-toggle {
+  display: none;
   margin-left: auto;
-  color: var(--dim);
-  border-color: transparent;
-  background: transparent;
+  color: var(--on-accent);
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 .editing .edit-toggle {
-  color: var(--on-accent);
-  background: var(--accent);
+  display: block;
 }
 
 /* ---- Space menu in edit mode ------------------------------------------------------------------------------- */
