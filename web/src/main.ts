@@ -62,16 +62,10 @@ function render({ space, spaces }: StartPageData): void {
     ),
   );
 
+  const others = spaces.filter((s) => s.slug !== space.slug);
+  byId('switcher').classList.toggle('single', others.length === 0);
   byId('spaces').replaceChildren(
-    ...(spaces.length > 1
-      ? spaces.map((s) =>
-          el('a', {
-            href: `/s/${encodeURIComponent(s.slug)}`,
-            className: s.slug === space.slug ? 'space active' : 'space',
-            textContent: s.name,
-          }),
-        )
-      : []),
+    ...others.map((s) => el('a', { href: `/s/${encodeURIComponent(s.slug)}`, className: 'space', textContent: s.name })),
   );
 
   const content = byId('content');
@@ -129,4 +123,15 @@ const data = await loadData();
 if (data) {
   render(data);
   addEventListener('hashchange', () => render(data));
+  closeSwitcherOnOutsideClickOrEscape();
+}
+
+function closeSwitcherOnOutsideClickOrEscape(): void {
+  const switcher = byId('switcher') as HTMLDetailsElement;
+  document.addEventListener('click', (e) => {
+    if (switcher.open && !switcher.contains(e.target as Node)) switcher.open = false;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') switcher.open = false;
+  });
 }

@@ -11,9 +11,12 @@
   </head>
   <body>
     <header class="bar">
-      <h1 id="space-name"></h1>
+      <!-- The other spaces stay out of sight until the switcher is opened, e.g. while sharing a screen. -->
+      <details id="switcher" class="switcher">
+        <summary><h1 id="space-name"></h1></summary>
+        <nav id="spaces" class="spaces" aria-label="Spaces"></nav>
+      </details>
       <nav id="tabs" class="tabs" aria-label="Tabs"></nav>
-      <nav id="spaces" class="spaces" aria-label="Spaces"></nav>
     </header>
     <main id="content"></main>
     <!--space-data-->

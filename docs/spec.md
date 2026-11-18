@@ -140,6 +140,12 @@ The icon fetch is server-side request handling of arbitrary URLs. Guard it: `htt
 timeout, a response size cap, and an image content-type check. Fetching LAN addresses is allowed on purpose
 (intranet bookmarks), which is acceptable only because the server is not publicly reachable.
 
+## Start page
+
+- The space name, top left, is also the space switcher. The other spaces are listed only when it is opened,
+  so they stay out of sight while sharing a screen with one customer.
+- Tabs sit next to it; the active tab is kept in the URL hash.
+
 ## Editing
 
 - Add, edit and delete tabs, sections and tiles inline on the start page.
