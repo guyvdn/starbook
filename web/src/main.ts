@@ -171,8 +171,13 @@ function renderSection(tab: Tab, section: Section): HTMLElement {
     'div',
     { className: 'grid' },
     ...section.tiles.map((tile) => renderTile(tile)),
-    // Always there, so adding a bookmark needs no trip to edit mode; outside edit mode it is just a faint "+".
-    el('button', { className: editing ? 'tile add' : 'tile add quiet', textContent: '+', title: 'Add a bookmark', onclick: () => addTile(section) }),
+    // In edit mode every section has one. Outside it, a single faint "+" after the last section adds a
+    // bookmark without a trip to edit mode; the dialog asks which section.
+    editing
+      ? el('button', { className: 'tile add', textContent: '+', title: 'Add a bookmark', onclick: () => addTile(tab, section) })
+      : section === tab.sections.at(-1)
+        ? el('button', { className: 'tile add quiet', textContent: '+', title: 'Add a bookmark', onclick: () => addTile(tab, null) })
+        : null,
   );
 
   const node = el('section', {}, heading, grid);
@@ -311,10 +316,12 @@ function otherSpaces(): SpaceSummary[] {
   return spaces.filter((s) => s.slug !== space.slug);
 }
 
-function addTile(section: Section): void {
+/** @param section The section to add to, or `null` to let the dialog ask. */
+function addTile(tab: Tab, section: Section | null): void {
   openTileDialog({
     otherSpaces: otherSpaces(),
-    onSave: (tile) => commit((s) => findSectionIn(s, section.id)?.tiles.push(tile)),
+    sections: section ? undefined : tab.sections.map((x) => ({ id: x.id, title: x.title ?? 'Untitled section' })),
+    onSave: (tile, sectionId) => commit((s) => findSectionIn(s, section?.id ?? sectionId ?? tab.sections.at(-1)!.id)?.tiles.push(tile)),
   });
 }
 

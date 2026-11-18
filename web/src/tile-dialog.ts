@@ -7,7 +7,9 @@ export interface TileDialogOptions {
   tile?: Tile;
   /** Spaces a tile can be moved or copied to (not the current one). */
   otherSpaces: SpaceSummary[];
-  onSave(tile: Tile): void;
+  /** For a new tile in a tab with several sections: which one to add it to. The last entry is the default. */
+  sections?: { id: string; title: string }[];
+  onSave(tile: Tile, sectionId?: string): void;
   onDelete?(): void;
   onTransfer?(tile: Tile, slug: string, mode: 'move' | 'copy'): Promise<void>;
 }
@@ -70,6 +72,12 @@ export function openTileDialog(options: TileDialogOptions): void {
   title.addEventListener('input', () => (titleTouched = true));
   file.addEventListener('change', () => file.files?.[0] && void useImage(file.files[0]));
 
+  const sectionSelect = el(
+    'select',
+    {},
+    ...(options.sections ?? []).map((x, i, all) => el('option', { value: x.id, textContent: x.title, selected: i === all.length - 1 })),
+  );
+
   const transferSelect = el(
     'select',
     {},
@@ -83,6 +91,7 @@ export function openTileDialog(options: TileDialogOptions): void {
     el('h2', { textContent: tile ? 'Edit bookmark' : 'Add bookmark' }),
     el('label', {}, 'URL', url),
     el('label', {}, 'Title', title),
+    !tile && (options.sections?.length ?? 0) > 1 ? el('label', {}, 'Section', sectionSelect) : null,
     el(
       'div',
       { className: 'image-row' },
@@ -163,7 +172,7 @@ export function openTileDialog(options: TileDialogOptions): void {
     }
     if (lookup) await lookup;
     if (!title.value.trim()) title.value = parsed.hostname.replace(/^www\./, '');
-    options.onSave(current());
+    options.onSave(current(), sectionSelect.value || undefined);
     dialog.close();
   });
 
