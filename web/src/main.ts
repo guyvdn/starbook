@@ -190,7 +190,7 @@ function renderTile(tile: Tile): HTMLElement {
     thumb.append(el('img', { src: `/img/${tile.image}`, alt: '', loading: 'lazy', decoding: 'async', draggable: false }));
   } else {
     thumb.classList.add('letter');
-    thumb.style.setProperty('--hue', String(hue(hostOf(tile.url))));
+    thumb.style.setProperty('--letter', `var(--a${hash(hostOf(tile.url)) % 7})`);
     thumb.textContent = initial(tile.title);
   }
   const node = el('a', { className: 'tile', href: tile.url, title: tile.url }, thumb, el('span', { className: 'title', textContent: tile.title }));
@@ -224,11 +224,11 @@ function initial(title: string): string {
   return (/[\p{L}\p{N}]/u.exec(title)?.[0] ?? '?').toUpperCase();
 }
 
-/** Stable colour per site, so tiles for the same site share a colour. */
-function hue(text: string): number {
+/** Stable accent per site, so tiles for the same site share a colour. */
+function hash(text: string): number {
   let h = 0;
   for (const ch of text) h = (h * 31 + ch.codePointAt(0)!) >>> 0;
-  return h % 360;
+  return h;
 }
 
 // ---------------------------------------------------------------------------------------------------------------
