@@ -19,6 +19,7 @@
   /* Tiles are white in both themes, like Speed Dial: icons are made for a light background. */
   --tile-bg: #ffffff;
   --tile-text: #1f1f1f;
+  --title-bg: #efeddc;
   --letter-text: #fffbeb;
   --selection: #cfcfde;
   --a0: #036a96;
@@ -52,6 +53,7 @@
     --danger: #ff5555;
     --shadow-color: rgb(25 26 33 / 0.6); /* background darker */
     --selection: #44475a;
+    --title-bg: #44475a; /* selection: lighter than the surface, so the band stands off the page */
   }
 }
 
@@ -203,7 +205,7 @@ h2 {
   border-radius: 10px;
   overflow: hidden;
   /* Surface, not white: the anti-aliased edges around the title band would otherwise show a white fringe. */
-  background: var(--surface);
+  background: var(--title-bg);
   color: var(--tile-text);
   box-shadow: var(--shadow);
   outline-offset: 2px;
@@ -250,7 +252,7 @@ h2 {
 /* The title sits on its own band in the theme's surface colour, below the white image area. */
 .title {
   padding: 8px 10px;
-  background: var(--surface);
+  background: var(--title-bg);
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
