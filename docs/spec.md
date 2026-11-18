@@ -113,7 +113,7 @@ flowchart LR
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/` | Redirect to the first space. |
-| `GET` | `/spaces/{slug}` | The start page, with the space JSON embedded in the HTML — no second request. The prefix keeps slugs clear of `/api`, `/img` and `/assets`. |
+| `GET` | `/spaces/{slug}/{tab?}` | The start page, with the space JSON embedded in the HTML — no second request. The page picks the tab; an unknown one shows the first. The prefix keeps slugs clear of `/api`, `/img` and `/assets`. |
 | `GET` | `/s/{slug}` | Permanent redirect to `/spaces/{slug}` (the original address). |
 | `GET` | `/api/spaces` | Space list (slug, name, order). |
 | `GET` | `/api/spaces/{slug}` | One space. |
@@ -153,7 +153,7 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 - The space name, top left, is also the space switcher. The other spaces are listed only when it is opened,
   so they stay out of sight while sharing a screen with one customer.
-- Tabs sit next to it; the active tab is kept in the URL hash.
+- Tabs sit next to it; the active tab is in the path, `/spaces/personal/tools`, derived from the tab title (`-2`, `-3` for duplicate titles). Renaming a tab changes its address. Switching tabs is in-page (`pushState`), so Back returns to the previous tab.
 
 ## Editing
 

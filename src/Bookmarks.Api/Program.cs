@@ -79,7 +79,8 @@ app.MapGet("/", (SpaceStore store) => Results.Redirect($"/spaces/{store.FirstSlu
 // Old address of a space; kept so configured new-tab URLs keep working.
 app.MapGet("/s/{slug}", (string slug) => Results.Redirect($"/spaces/{Uri.EscapeDataString(slug)}", permanent: true));
 
-app.MapGet("/spaces/{slug}", (string slug, SpaceStore store, StartPage page, HttpContext http) =>
+// The tab segment is resolved by the page itself; an unknown tab shows the first one.
+app.MapGet("/spaces/{slug}/{tab?}", (string slug, SpaceStore store, StartPage page, HttpContext http) =>
 {
     if (store.Get(slug) is not { } space) return Results.NotFound();
     http.Response.Headers.CacheControl = "no-cache";

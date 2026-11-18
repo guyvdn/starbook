@@ -11,6 +11,7 @@ import {
   newTab,
   removeTile,
   slugify,
+  tabSlugs,
   tileCount,
 } from './model';
 import { openImportDialog } from './import-dialog';
@@ -68,18 +69,51 @@ addEventListener('beforeunload', (e) => {
 // Rendering
 // ---------------------------------------------------------------------------------------------------------------
 
-/** The active tab lives in the URL hash, so it survives a reload. */
+/** The active tab lives in the path, /spaces/{space}/{tab}, so it survives a reload and can be bookmarked. */
+let currentTabId: string | null = null;
+
 function activeTab(): Tab | undefined {
+  return space.tabs.find((t) => t.id === currentTabId) ?? space.tabs[0];
+}
+
+function tabPath(tab: Tab | undefined): string {
+  const base = `/spaces/${encodeURIComponent(space.slug)}`;
+  return tab ? `${base}/${tabSlugs(space.tabs).get(tab.id)}` : base;
+}
+
+/** The tab the address names. Also accepts the old "#<tab id>" form. */
+function tabFromLocation(): Tab | undefined {
+  const segment = /^\/spaces\/[^/]+\/([^/]+)/.exec(location.pathname)?.[1];
+  if (segment) {
+    const slug = decodeURIComponent(segment);
+    const slugs = tabSlugs(space.tabs);
+    const tab = space.tabs.find((t) => slugs.get(t.id) === slug);
+    if (tab) return tab;
+  }
   const id = decodeURIComponent(location.hash.slice(1));
-  return space.tabs.find((t) => t.id === id) ?? space.tabs[0];
+  return space.tabs.find((t) => t.id === id);
 }
 
 function selectTab(tab: Tab): void {
-  history.replaceState(null, '', `#${encodeURIComponent(tab.id)}`);
+  if (tab.id === activeTab()?.id) return;
+  currentTabId = tab.id;
+  history.pushState(null, '', tabPath(tab));
   render();
 }
 
+/** Keeps the address in step with the active tab, e.g. after a rename or when the tab was deleted. */
+function syncAddress(): void {
+  const path = tabPath(activeTab());
+  if (location.pathname !== path || location.hash) history.replaceState(null, '', path);
+}
+
+/** A plain click switches tabs in place; a middle or modified click opens the tab's address as a normal link. */
+function isPlainClick(e: MouseEvent): boolean {
+  return e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey;
+}
+
 function render(): void {
+  syncAddress();
   document.title = space.name;
   document.body.classList.toggle('editing', editing);
   byId('space-name').textContent = space.name;
@@ -113,17 +147,18 @@ function renderTabs(): void {
     ...present([
     ...space.tabs.map((tab) => {
       const link = el('a', {
-        href: `#${encodeURIComponent(tab.id)}`,
+        href: tabPath(tab),
         className: tab === current ? 'tab active' : 'tab',
         textContent: tab.title,
       });
+      link.addEventListener('click', (e) => {
+        if (!isPlainClick(e)) return;
+        e.preventDefault();
+        if (editing && tab === current) renameTab(tab);
+        else selectTab(tab);
+      });
       if (editing) {
         link.draggable = true;
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          if (tab === current) renameTab(tab);
-          else selectTab(tab);
-        });
         if (tab === current) link.title = 'Click to rename';
         dragSource(link, { kind: 'tab', id: tab.id });
         dropTarget(link, 'x', (d) => d.kind === 'tab' || d.kind === 'tile', (d, after) => {
@@ -513,8 +548,12 @@ if (data) {
     editing = true;
     history.replaceState(null, '', location.pathname + location.hash);
   }
+  currentTabId = tabFromLocation()?.id ?? null;
   byId('edit-toggle').addEventListener('click', toggleEditing);
-  addEventListener('hashchange', render);
+  addEventListener('popstate', () => {
+    currentTabId = tabFromLocation()?.id ?? null;
+    render();
+  });
   wireSwitcher();
   render();
 }

@@ -80,6 +80,23 @@ export function slugify(name: string): string {
     .replace(/-+$/, '');
 }
 
+/**
+ * The readable URL segment of each tab, derived from its title: "/spaces/personal/tools". Tabs with the same
+ * title get "-2", "-3" in order, so every tab keeps a unique address. Renaming a tab changes its address.
+ */
+export function tabSlugs(tabs: readonly Tab[]): Map<string, string> {
+  const result = new Map<string, string>();
+  const taken = new Set<string>();
+  for (const tab of tabs) {
+    const base = slugify(tab.title) || 'tab';
+    let slug = base;
+    for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
+    taken.add(slug);
+    result.set(tab.id, slug);
+  }
+  return result;
+}
+
 /** Accept "example.com" as well as a full URL. */
 export function normalizeUrl(input: string): string {
   const trimmed = input.trim();
