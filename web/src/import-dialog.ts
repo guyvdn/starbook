@@ -15,16 +15,33 @@ export function parseExport(text: string): SpeedDialExport {
   return data as SpeedDialExport;
 }
 
-function toTile(dial: SpeedDialExport['dials'][number]): Tile | null {
-  let url: URL;
+/** The server accepts only absolute http(s) URLs with a plain host name or IP address. */
+function parseHttpUrl(raw: string): URL | null {
   try {
-    url = new URL(dial.url);
+    const url = new URL(raw.trim());
+    const plainHost = /^[a-z0-9.-]+$/i.test(url.hostname) || /^\[[0-9a-f:.]+\]$/i.test(url.hostname);
+    return (url.protocol === 'http:' || url.protocol === 'https:') && plainHost ? url : null;
   } catch {
     return null;
   }
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-  const title = dial.title?.trim() || url.hostname.replace(/^www\./, '');
-  return { id: newId('t'), title, url: url.href, image: null };
+}
+
+/**
+ * Old Speed Dial entries can hold a pasted URL behind a stray prefix, e.g. "http://%20https://example.com/".
+ * Browsers accept that; the server does not. Use the part from the last "http(s)://" when the whole is invalid.
+ */
+export function cleanUrl(raw: string): string | null {
+  const url = parseHttpUrl(raw);
+  if (url) return url.href;
+  const last = Math.max(raw.lastIndexOf('http://'), raw.lastIndexOf('https://'));
+  return last > 0 ? (parseHttpUrl(raw.slice(last))?.href ?? null) : null;
+}
+
+function toTile(dial: SpeedDialExport['dials'][number]): Tile | null {
+  const href = cleanUrl(dial.url ?? '');
+  if (!href) return null;
+  const title = dial.title?.trim() || new URL(href).hostname.replace(/^www\./, '');
+  return { id: newId('t'), title, url: href, image: null };
 }
 
 /** Each Speed Dial group becomes a tab with one untitled section, in the export's order. */
@@ -121,6 +138,9 @@ export function openImportDialog(spaces: SpaceSummary[], currentSlug: string): v
       for (const [slug, tabs] of bySpace) {
         status.textContent = `Adding ${tabs.length} tab(s) to ${nameOf(slug)}…`;
         const space = await api.getSpace(slug);
+        // A new space starts with one empty tab; replace it rather than keep an empty "Home" next to the import.
+        const onlyEmptyTab = space.tabs.length === 1 && space.tabs[0]!.sections.every((x) => x.tiles.length === 0);
+        if (onlyEmptyTab) space.tabs = [];
         space.tabs.push(...tabs);
         const outcome = await api.saveSpace(space);
         if (outcome.kind !== 'saved') throw new Error(outcome.kind === 'error' ? outcome.message : `${nameOf(slug)} changed meanwhile; try again.`);
