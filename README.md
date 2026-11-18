@@ -22,7 +22,7 @@ dotnet run --project src/Bookmarks.Api   # API on http://localhost:5080, data in
 cd web && npm install && npm run dev      # page on http://localhost:5173, proxies the API
 ```
 
-Open <http://localhost:5173/s/personal>. An empty data folder is seeded with a `personal` space.
+Open <http://localhost:5173/spaces/personal>. An empty data folder is seeded with a `personal` space.
 
 To run the production setup locally, build the frontend once (`npm run build` in `web`) and open
 <http://localhost:5080/> instead: the API then serves the page with the space embedded.

@@ -94,7 +94,7 @@ data/
 
 ```mermaid
 flowchart LR
-    B[Browser profile<br/>new tab → /s/slug] -->|HTML with space JSON embedded| S[ASP.NET Core<br/>Native AOT]
+    B[Browser profile<br/>new tab → /spaces/slug] -->|HTML with space JSON embedded| S[ASP.NET Core<br/>Native AOT]
     B -->|images, cached immutable| S
     S --> D[(data/ volume<br/>JSON + images)]
     S -->|fetch icon on add| W[Bookmarked site]
@@ -113,7 +113,8 @@ flowchart LR
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/` | Redirect to the first space. |
-| `GET` | `/s/{slug}` | The start page, with the space JSON embedded in the HTML — no second request. |
+| `GET` | `/spaces/{slug}` | The start page, with the space JSON embedded in the HTML — no second request. The prefix keeps slugs clear of `/api`, `/img` and `/assets`. |
+| `GET` | `/s/{slug}` | Permanent redirect to `/spaces/{slug}` (the original address). |
 | `GET` | `/api/spaces` | Space list (slug, name, order). |
 | `GET` | `/api/spaces/{slug}` | One space. |
 | `PUT` | `/api/spaces/{slug}` | Save a space; requires the base `version`, `409` when stale. |

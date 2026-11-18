@@ -74,9 +74,12 @@ app.MapGet("/healthz", (SpaceStore store) =>
     return store.FirstSlug() is null ? Results.StatusCode(StatusCodes.Status503ServiceUnavailable) : Results.Text("ok");
 });
 
-app.MapGet("/", (SpaceStore store) => Results.Redirect($"/s/{store.FirstSlug()}"));
+app.MapGet("/", (SpaceStore store) => Results.Redirect($"/spaces/{store.FirstSlug()}"));
 
-app.MapGet("/s/{slug}", (string slug, SpaceStore store, StartPage page, HttpContext http) =>
+// Old address of a space; kept so configured new-tab URLs keep working.
+app.MapGet("/s/{slug}", (string slug) => Results.Redirect($"/spaces/{Uri.EscapeDataString(slug)}", permanent: true));
+
+app.MapGet("/spaces/{slug}", (string slug, SpaceStore store, StartPage page, HttpContext http) =>
 {
     if (store.Get(slug) is not { } space) return Results.NotFound();
     http.Response.Headers.CacheControl = "no-cache";

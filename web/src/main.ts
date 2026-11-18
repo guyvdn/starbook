@@ -93,7 +93,7 @@ function renderSpaces(): void {
   // Editing starts from this menu, so the start page itself shows no edit controls.
   byId('spaces').replaceChildren(
     ...present([
-    ...others.map((s) => el('a', { href: `/s/${encodeURIComponent(s.slug)}`, className: 'space', textContent: s.name })),
+    ...others.map((s) => el('a', { href: `/spaces/${encodeURIComponent(s.slug)}`, className: 'space', textContent: s.name })),
     others.length > 0 ? el('hr') : null,
     !editing ? el('button', { className: 'space', textContent: 'Edit', onclick: toggleEditing }) : null,
     editing ? el('button', { className: 'space', textContent: 'Rename this space…', onclick: renameSpace }) : null,
@@ -414,11 +414,11 @@ function renameSpace(): void {
 async function createSpace(): Promise<void> {
   const name = prompt('Name of the new space')?.trim();
   if (!name) return;
-  const slug = prompt('Address of the new space: /s/…', slugify(name))?.trim();
+  const slug = prompt('Address of the new space: /spaces/…', slugify(name))?.trim();
   if (!slug) return;
   try {
     const created = await api.createSpace(slug, name);
-    location.href = `/s/${created.slug}?edit`;
+    location.href = `/spaces/${created.slug}?edit`;
   } catch (e) {
     toast(e instanceof Error ? e.message : String(e));
   }
@@ -483,9 +483,9 @@ async function loadData(): Promise<StartPageData | null> {
   if (embedded?.textContent) return JSON.parse(embedded.textContent) as StartPageData;
 
   const list = await api.listSpaces();
-  const slug = /^\/s\/([^/]+)/.exec(location.pathname)?.[1];
+  const slug = /^\/spaces\/([^/]+)/.exec(location.pathname)?.[1];
   if (!slug) {
-    if (list[0]) location.replace(`/s/${list[0].slug}`);
+    if (list[0]) location.replace(`/spaces/${list[0].slug}`);
     return null;
   }
   return { space: await api.getSpace(decodeURIComponent(slug)), spaces: list };
