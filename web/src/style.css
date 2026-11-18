@@ -202,7 +202,8 @@ h2 {
   flex-direction: column;
   border-radius: 10px;
   overflow: hidden;
-  background: var(--tile-bg);
+  /* Surface, not white: the anti-aliased edges around the title band would otherwise show a white fringe. */
+  background: var(--surface);
   color: var(--tile-text);
   box-shadow: var(--shadow);
   outline-offset: 2px;
