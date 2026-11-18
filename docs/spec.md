@@ -1,7 +1,7 @@
 # Bookmarks — spec
 
 A self-hosted start page for bookmarks, split into **spaces** so each browser profile shows only its own
-subset. It replaces a Speed Dial 2 setup: the same group/tile model, plus one layer on top, and without the
+subset. It replaces a Speed Dial 2 setup: its tab/tile model, plus spaces above and optional sections within a tab, and without the
 features that went unused.
 
 ## Goals
@@ -25,20 +25,26 @@ features that went unused.
 
 ```mermaid
 erDiagram
-    SPACE ||--o{ GROUP : contains
-    GROUP ||--o{ TILE : contains
+    SPACE ||--o{ TAB : contains
+    TAB ||--|{ SECTION : contains
+    SECTION ||--o{ TILE : contains
     TILE }o--o| IMAGE : shows
 ```
 
 | Entity | Fields | Notes |
 |---|---|---|
-| Space | `slug`, `name`, `version`, `groups[]` | One JSON file per space. `slug` is the URL segment. |
-| Group | `id`, `title`, `tiles[]` | Shown as a tab or section within the space. |
+| Space | `slug`, `name`, `version`, `tabs[]` | One JSON file per space. `slug` is the URL segment. One per browser profile. |
+| Tab | `id`, `title`, `sections[]` | One tab visible at a time. |
+| Section | `id`, `title`, `tiles[]` | A titled block of tiles within a tab. `title` may be `null`. |
 | Tile | `id`, `title`, `url`, `image` | `image` is an image reference or `null`. |
 | Image | content hash + extension | Stored once, shared by any tile that references it. |
 
-**Order is array order.** Groups in `groups[]` and tiles in `tiles[]` are stored in display order; there is no
-`position` field. Reordering, or moving a tile to another group or space, saves the affected arrays.
+**Sections are optional in practice.** Every tab has at least one section, but a tab whose only section has no
+title renders as a plain grid of tiles, with no heading. A small tab stays flat; a large one can be split into
+titled sections without changing anything else.
+
+**Order is array order.** Tabs, sections and tiles are stored in display order; there is no `position` field.
+Reordering, or moving a tile to another section, tab or space, saves the affected arrays.
 
 Example `data/spaces/personal.json`:
 
@@ -47,12 +53,18 @@ Example `data/spaces/personal.json`:
   "slug": "personal",
   "name": "Personal",
   "version": 42,
-  "groups": [
+  "tabs": [
     {
-      "id": "g_7k2m",
+      "id": "b_7k2m",
       "title": "Home",
-      "tiles": [
-        { "id": "t_9xq1", "title": "Example", "url": "https://example.com/", "image": "3f2a…c1.png" }
+      "sections": [
+        {
+          "id": "s_4hd0",
+          "title": null,
+          "tiles": [
+            { "id": "t_9xq1", "title": "Example", "url": "https://example.com/", "image": "3f2a…c1.png" }
+          ]
+        }
       ]
     }
   ]
@@ -130,8 +142,9 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 ## Editing
 
-- Add, edit and delete tiles and groups inline on the start page.
-- Drag and drop to reorder tiles within a group, move them between groups, and reorder groups.
+- Add, edit and delete tabs, sections and tiles inline on the start page.
+- Drag and drop to reorder tiles, move them between sections, and reorder sections and tabs. Dropping a tile
+  on a tab moves it to that tab's first section.
 - Move or copy a tile to another space.
 - Saves go through `PUT /api/spaces/{slug}`; on `409` the page reloads the space and tells the user.
 
@@ -140,6 +153,8 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 A one-off import of a Speed Dial 2 JSON export (`dials[]`, `groups[]`, `preferences`):
 
 - Takes a mapping of Speed Dial groups to spaces; unmapped groups go to a default space.
+- Each Speed Dial group becomes a tab with one untitled section. Splitting into sections is done afterwards
+  in the app.
 - Keeps group and tile order from the export's `position` fields.
 - Keeps `title` and `url`. Drops visit counters, timestamps and preferences.
 - **Ignores the exported thumbnails.** They are page screenshots or links to hosts that are gone or will go.
@@ -150,4 +165,3 @@ A one-off import of a Speed Dial 2 JSON export (`dials[]`, `groups[]`, `preferen
 
 - Which "custom new tab URL" extension for Edge to use — chosen on security: minimal permissions, open source,
   maintained.
-- Group presentation: tabs (one group visible) or sections (all groups on one scrolling page).
