@@ -541,3 +541,29 @@ section.drop-after {
   display: grid;
   place-items: center;
 }
+
+/* ---- Import dialog ----------------------------------------------------------------------------------------- */
+
+.import-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.import-map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.tile-dialog .import-map label {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+}
+
+.import-map select {
+  width: 180px;
+}

@@ -168,15 +168,20 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 ## Import from Speed Dial 2
 
-A one-off import of a Speed Dial 2 JSON export (`dials[]`, `groups[]`, `preferences`):
+A one-off import of a Speed Dial 2 JSON export (`dials[]`, `groups[]`, `preferences`), from the space menu in
+edit mode. It runs in the browser against the normal API, so the server needs no import code:
 
-- Takes a mapping of Speed Dial groups to spaces; unmapped groups go to a default space.
+- Each group is mapped to an existing space, or skipped. Create the spaces first.
 - Each Speed Dial group becomes a tab with one untitled section. Splitting into sections is done afterwards
   in the app.
 - Keeps group and tile order from the export's `position` fields.
 - Keeps `title` and `url`. Drops visit counters, timestamps and preferences.
 - **Ignores the exported thumbnails.** They are page screenshots or links to hosts that are gone or will go.
   Every imported tile gets a freshly fetched icon instead.
+- Tiles without an http(s) URL are skipped and counted. Tiles sharing a `position` keep creation order.
+- Afterwards it runs **Fetch missing icons** per space. A test run on a real export of ~900 tiles took two
+  minutes and found an icon for 80%; the misses are mostly sites behind a login redirect or bot protection.
+- Importing twice adds the tabs twice.
 - The export file is read from outside the repo and is never committed.
 
 ## Open questions

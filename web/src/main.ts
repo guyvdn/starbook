@@ -13,6 +13,7 @@ import {
   slugify,
   tileCount,
 } from './model';
+import { openImportDialog } from './import-dialog';
 import { openTileDialog } from './tile-dialog';
 import type { Section, Space, SpaceSummary, StartPageData, Tab, Tile } from './types';
 
@@ -98,6 +99,7 @@ function renderSpaces(): void {
     editing ? el('button', { className: 'space', textContent: 'Rename this space…', onclick: renameSpace }) : null,
     editing ? el('button', { className: 'space', textContent: 'Fetch missing icons', onclick: fillMissingIcons }) : null,
     editing ? el('button', { className: 'space', textContent: 'New space…', onclick: createSpace }) : null,
+    editing ? el('button', { className: 'space', textContent: 'Import from Speed Dial…', onclick: startImport }) : null,
     editing ? el('button', { className: 'space danger', textContent: 'Delete this space…', onclick: deleteSpace }) : null,
     ]),
   );
@@ -444,6 +446,14 @@ async function fillMissingIcons(): Promise<void> {
 
 function countImages(s: Space): number {
   return s.tabs.flatMap((t) => t.sections).flatMap((x) => x.tiles).filter((t) => t.image).length;
+}
+
+function startImport(): void {
+  if (dirty || saving) {
+    toast('Still saving; try again in a moment.');
+    return;
+  }
+  openImportDialog(spaces, space.slug);
 }
 
 function toggleEditing(): void {
