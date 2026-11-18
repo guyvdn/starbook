@@ -16,6 +16,9 @@
   --heading: #644ac9;
   --danger: #cb3a2a;
   --shadow-color: rgb(188 186 179 / 0.7); /* background darker */
+  /* Tiles are white in both themes, like Speed Dial: icons are made for a light background. */
+  --tile-bg: #ffffff;
+  --tile-text: #1f1f1f;
   --letter-text: #fffbeb;
   --selection: #cfcfde;
   --a0: #036a96;
@@ -48,15 +51,7 @@
     --heading: #bd93f9;
     --danger: #ff5555;
     --shadow-color: rgb(25 26 33 / 0.6); /* background darker */
-    --letter-text: #282a36;
     --selection: #44475a;
-    --a0: #8be9fd;
-    --a1: #50fa7b;
-    --a2: #ffb86c;
-    --a3: #ff79c6;
-    --a4: #bd93f9;
-    --a5: #ff5555;
-    --a6: #f1fa8c;
   }
 }
 
@@ -207,7 +202,8 @@ h2 {
   flex-direction: column;
   border-radius: 10px;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--tile-bg);
+  color: var(--tile-text);
   box-shadow: var(--shadow);
   outline-offset: 2px;
   transition: transform 80ms ease;
@@ -218,23 +214,35 @@ h2 {
 }
 
 .thumb {
-  display: grid;
-  place-items: center;
+  position: relative;
   aspect-ratio: 16 / 10;
-  background: var(--bg);
+  overflow: hidden;
+  background: var(--tile-bg);
+}
+
+/* Icons sit centred at a fixed share of the tile, scaled up or down to fit; wide images use the width. */
+.thumb img,
+.thumb .badge {
+  position: absolute;
+  inset: 0;
+  margin: auto;
 }
 
 .thumb img {
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 62%;
   object-fit: contain;
-  padding: 14%;
 }
 
-.thumb.letter {
+.thumb .badge {
+  height: 62%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
   background: var(--letter);
   color: var(--letter-text);
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 600;
 }
 
@@ -519,4 +527,11 @@ section.drop-after {
 .toast.show {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+
+.thumb.preview > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
 }

@@ -148,7 +148,7 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 ## Start page
 
 - Dracula theme (draculatheme.com/spec): Dracula when the OS is in dark mode, Alucard in light mode. Only
-  spec colours are used; section headings are Purple, letter tiles take a spec accent per site.
+  spec colours are used; section headings are Purple, tiles are white in both themes (icons are made for a light background), and a tile without an image shows a letter badge in a spec (Alucard) accent per site.
 
 - The space name, top left, is also the space switcher. The other spaces are listed only when it is opened,
   so they stay out of sight while sharing a screen with one customer.

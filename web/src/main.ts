@@ -190,9 +190,9 @@ function renderTile(tile: Tile): HTMLElement {
   if (tile.image) {
     thumb.append(el('img', { src: `/img/${tile.image}`, alt: '', loading: 'lazy', decoding: 'async', draggable: false }));
   } else {
-    thumb.classList.add('letter');
-    thumb.style.setProperty('--letter', `var(--a${hash(hostOf(tile.url)) % 7})`);
-    thumb.textContent = initial(tile.title);
+    const badge = el('span', { className: 'badge', textContent: initial(tile.title) });
+    badge.style.setProperty('--letter', `var(--a${hash(hostOf(tile.url)) % 7})`);
+    thumb.append(badge);
   }
   const node = el('a', { className: 'tile', href: tile.url, title: tile.url }, thumb, el('span', { className: 'title', textContent: tile.title }));
 
