@@ -12,6 +12,8 @@ public static partial class SpaceValidator
 
     public static bool IsValidSlug(string? slug) => slug is not null && SlugPattern().IsMatch(slug);
 
+    public static bool IsValidImage(string? image) => image is not null && ImagePattern().IsMatch(image);
+
     /// <returns>An error message, or <c>null</c> when the space is valid.</returns>
     public static string? Validate(Space space)
     {
@@ -46,7 +48,7 @@ public static partial class SpaceValidator
                     if (!Uri.TryCreate(tile.Url, UriKind.Absolute, out var uri)
                         || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
                         return $"Tile '{tile.Title}' needs an http or https URL.";
-                    if (tile.Image is not null && !ImagePattern().IsMatch(tile.Image))
+                    if (tile.Image is not null && !IsValidImage(tile.Image))
                         return $"Tile '{tile.Title}' has an invalid image reference.";
                 }
             }

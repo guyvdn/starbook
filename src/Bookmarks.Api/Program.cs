@@ -8,6 +8,21 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 var dataPath = Path.GetFullPath(builder.Configuration["DataPath"] ?? "data", builder.Environment.ContentRootPath);
 builder.Services.AddSingleton(await SpaceStore.OpenAsync(dataPath));
 builder.Services.AddSingleton<StartPage>();
+builder.Services.AddSingleton(new ImageStore(dataPath));
+builder.Services.AddHttpClient<IconFetcher>(client =>
+    {
+        client.Timeout = TimeSpan.FromSeconds(8);
+        // Some sites refuse requests that do not look like a browser.
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36");
+        client.DefaultRequestHeaders.Accept.ParseAdd("text/html,image/*,*/*;q=0.8");
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+    {
+        AutomaticDecompression = System.Net.DecompressionMethods.All,
+        MaxAutomaticRedirections = 5,
+        ConnectTimeout = TimeSpan.FromSeconds(5),
+    });
 
 var app = builder.Build();
 
@@ -66,5 +81,55 @@ api.MapPost("/", async (CreateSpaceRequest request, SpaceStore store, Cancellati
 
 api.MapDelete("/{slug}", async (string slug, SpaceStore store, CancellationToken ct) =>
     await store.DeleteAsync(slug, ct) ? Results.NoContent() : Results.NotFound());
+
+app.MapPost("/api/icons", async (IconRequest request, IconFetcher icons, HttpContext http) =>
+{
+    if (!Uri.TryCreate(request.Url, UriKind.Absolute, out var url)
+        || (url.Scheme != Uri.UriSchemeHttp && url.Scheme != Uri.UriSchemeHttps))
+        return Results.BadRequest(new ErrorResponse("Give an http or https URL."));
+
+    // Bound the whole lookup, not just each request: a site can offer many candidates.
+    using var timeout = CancellationTokenSource.CreateLinkedTokenSource(http.RequestAborted);
+    timeout.CancelAfter(TimeSpan.FromSeconds(20));
+    try
+    {
+        return Results.Ok(await icons.FetchAsync(url, timeout.Token));
+    }
+    catch (OperationCanceledException) when (!http.RequestAborted.IsCancellationRequested)
+    {
+        return Results.Ok(new IconResult(null, null));
+    }
+});
+
+// The body is the image itself (upload or paste); its format is sniffed, so the Content-Type does not matter.
+app.MapPost("/api/images", async (HttpRequest request, ImageStore images, CancellationToken ct) =>
+{
+    using var buffer = new MemoryStream();
+    var chunk = new byte[16 * 1024];
+    int read;
+    while ((read = await request.Body.ReadAsync(chunk, ct)) > 0)
+    {
+        if (buffer.Length + read > ImageStore.MaxBytes)
+            return Results.BadRequest(new ErrorResponse("Images are limited to 1 MB."));
+        buffer.Write(chunk, 0, read);
+    }
+
+    return await images.SaveAsync(buffer.ToArray(), ct) is { } image
+        ? Results.Ok(new ImageResponse(image))
+        : Results.BadRequest(new ErrorResponse("Not a PNG, JPEG, GIF, WebP, ICO or SVG image."));
+});
+
+app.MapGet("/img/{name}", (string name, ImageStore images, HttpContext http) =>
+{
+    var path = Path.Combine(images.Directory, name);
+    if (!SpaceValidator.IsValidImage(name) || !File.Exists(path)) return Results.NotFound();
+
+    var headers = http.Response.Headers;
+    headers.CacheControl = "public, max-age=31536000, immutable"; // the name is the content hash
+    headers.XContentTypeOptions = "nosniff";
+    // An SVG opened directly must not run script on this origin.
+    headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; sandbox";
+    return Results.File(path, ImageStore.ContentType(Path.GetExtension(name)[1..]));
+});
 
 app.Run();

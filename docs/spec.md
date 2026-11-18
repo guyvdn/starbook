@@ -118,18 +118,21 @@ flowchart LR
 | `GET` | `/api/spaces/{slug}` | One space. |
 | `PUT` | `/api/spaces/{slug}` | Save a space; requires the base `version`, `409` when stale. |
 | `POST` | `/api/spaces` · `DELETE` `/api/spaces/{slug}` | Create / remove a space. |
-| `POST` | `/api/icons` | Fetch the best icon for a URL, store it, return the image reference. |
-| `POST` | `/api/images` | Upload or paste a custom image, store it, return the image reference. |
-| `GET` | `/img/{hash}.{ext}` | Serve an image with `Cache-Control: public, max-age=31536000, immutable`. |
+| `POST` | `/api/icons` | Fetch the best icon and the page title for a URL; store the icon, return both. |
+| `POST` | `/api/images` | Upload or paste a custom image (raw body, max 1 MB), store it, return the image reference. |
+| `GET` | `/img/{hash}.{ext}` | Serve an image, cached as immutable, with `nosniff` and a sandboxing CSP so an SVG opened directly cannot run script. |
 
 ## Images
 
 Every image is stored on the server, never hot-linked. This also keeps third parties from learning what is
 bookmarked.
 
-- **On add**, the server fetches the site's best icon: `apple-touch-icon`, then the web app manifest's largest
-  icon, then `<link rel="icon">`, then `/favicon.ico`. If nothing usable is found the tile shows a generated
-  letter tile.
+- **On add**, the server reads the page and collects candidates from `<link rel="icon">`,
+  `apple-touch-icon`, the web app manifest (skipping maskable/monochrome icons) and `/favicon.ico`. An SVG
+  wins, then the largest bitmap; the first candidate that downloads as a real image is kept. The page title
+  is returned too and fills an empty tile title. If nothing usable is found the tile shows a letter tile.
+- The image format is sniffed from the bytes (PNG, JPEG, GIF, WebP, ICO, SVG); file names and Content-Type
+  headers are not trusted.
 - **Custom image** per tile, by upload or paste, overrides the fetched one. This is how several tiles for the
   same site are told apart.
 - **Re-fetch** on demand per tile.
@@ -148,11 +151,15 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 ## Editing
 
-- Add, edit and delete tabs, sections and tiles inline on the start page.
+- An **Edit** button switches the page into edit mode; outside it, the page is a plain start page.
+- Add, edit and delete tabs, sections and tiles inline on the start page. In edit mode, clicking a tile opens
+  its dialog (URL, title, image, move/copy, delete); clicking the active tab renames it.
 - Drag and drop to reorder tiles, move them between sections, and reorder sections and tabs. Dropping a tile
   on a tab moves it to that tab's first section.
 - Move or copy a tile to another space.
 - Saves go through `PUT /api/spaces/{slug}`; on `409` the page reloads the space and tells the user.
+  Changes apply locally at once and are saved in the background; rapid edits coalesce into one save.
+- Space rename, create and delete live in the space switcher, in edit mode only.
 
 ## Import from Speed Dial 2
 

@@ -23,12 +23,17 @@ public sealed record StartPageData(Space Space, IReadOnlyList<SpaceSummary> Spac
 
 public sealed record ErrorResponse(string Error);
 
+public sealed record ImageResponse(string Image);
+
 [JsonSourceGenerationOptions(JsonSerializerDefaults.Web)]
 [JsonSerializable(typeof(Space))]
 [JsonSerializable(typeof(SpaceIndex))]
 [JsonSerializable(typeof(StartPageData))]
 [JsonSerializable(typeof(CreateSpaceRequest))]
 [JsonSerializable(typeof(ErrorResponse))]
+[JsonSerializable(typeof(ImageResponse))]
+[JsonSerializable(typeof(IconRequest))]
+[JsonSerializable(typeof(IconResult))]
 [JsonSerializable(typeof(IReadOnlyList<SpaceSummary>))]
 internal partial class AppJsonContext : JsonSerializerContext;
 
