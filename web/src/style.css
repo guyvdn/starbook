@@ -4,9 +4,9 @@
  */
 :root {
   /* Alucard */
-  --bg: #fffbeb;
+  --bg: #dedccf; /* background light: darker than the spec background, so the white tiles stand out */
   --surface: #efeddc; /* floating interactive elements */
-  --bar: #ece9df; /* background lighter */
+  --bar: #ceccc0; /* background dark */
   --text: #1f1f1f;
   --dim: #6c664b; /* comment: 4.5:1+ on the background here */
   --comment: #6c664b;
@@ -39,9 +39,9 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Dracula */
-    --bg: #282a36;
+    --bg: #21222c; /* background dark: darker than the spec background, so the tiles stand out */
     --surface: #343746;
-    --bar: #21222c; /* background dark */
+    --bar: #191a21; /* background darker */
     --text: #f8f8f2;
     --dim: rgb(248 248 242 / 0.7); /* comment (#6272a4) is too low-contrast for text that must be read */
     --comment: #6272a4;
