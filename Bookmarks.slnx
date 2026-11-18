@@ -1,8 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Bookmarks.Api/Bookmarks.Api.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/Bookmarks.Api.Tests/Bookmarks.Api.Tests.csproj" />
-  </Folder>
-</Solution>

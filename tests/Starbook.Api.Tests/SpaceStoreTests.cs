@@ -1,8 +1,8 @@
-namespace Bookmarks.Api.Tests;
+namespace Starbook.Api.Tests;
 
 public sealed class SpaceStoreTests : IDisposable
 {
-    private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "bookmarks-tests", Guid.NewGuid().ToString("N"));
+    private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "starbook-tests", Guid.NewGuid().ToString("N"));
 
     public void Dispose() => Directory.Delete(_dataPath, recursive: true);
 

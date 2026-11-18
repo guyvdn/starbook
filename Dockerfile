@@ -15,11 +15,11 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends clang zlib1g-dev \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /repo
-COPY src/Bookmarks.Api/Bookmarks.Api.csproj src/Bookmarks.Api/
-RUN dotnet restore src/Bookmarks.Api -a $([ "$TARGETARCH" = arm64 ] && echo arm64 || echo x64)
+COPY src/Starbook.Api/Starbook.Api.csproj src/Starbook.Api/
+RUN dotnet restore src/Starbook.Api -a $([ "$TARGETARCH" = arm64 ] && echo arm64 || echo x64)
 COPY src/ src/
-COPY --from=web /repo/src/Bookmarks.Api/wwwroot src/Bookmarks.Api/wwwroot
-RUN dotnet publish src/Bookmarks.Api -c Release --no-restore -o /app \
+COPY --from=web /repo/src/Starbook.Api/wwwroot src/Starbook.Api/wwwroot
+RUN dotnet publish src/Starbook.Api -c Release --no-restore -o /app \
       -a $([ "$TARGETARCH" = arm64 ] && echo arm64 || echo x64) \
  && rm -f /app/*.dbg \
  && mkdir /data
@@ -32,5 +32,5 @@ COPY --from=api --chown=1654:1654 /data /data
 ENV DataPath=/data
 VOLUME /data
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["./Bookmarks.Api", "--healthcheck"]
-ENTRYPOINT ["./Bookmarks.Api"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["./Starbook.Api", "--healthcheck"]
+ENTRYPOINT ["./Starbook.Api"]

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 public sealed record Space(string Slug, string Name, int Version, List<Tab> Tabs);
 

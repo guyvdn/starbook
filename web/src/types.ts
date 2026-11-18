@@ -1,4 +1,4 @@
-// Mirrors src/Bookmarks.Api/Model.cs.
+// Mirrors src/Starbook.Api/Model.cs.
 
 export interface Tile {
   id: string;

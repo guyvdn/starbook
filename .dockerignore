@@ -1,7 +1,7 @@
 **/bin/
 **/obj/
 **/node_modules/
-src/Bookmarks.Api/wwwroot/
+src/Starbook.Api/wwwroot/
 data/
 tests/
 .git/

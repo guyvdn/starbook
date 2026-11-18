@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 public sealed record IconRequest(string Url);
 

@@ -1,4 +1,4 @@
-namespace Bookmarks.Api.Tests;
+namespace Starbook.Api.Tests;
 
 public sealed class SpaceValidatorTests
 {

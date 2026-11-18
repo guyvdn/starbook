@@ -20,4 +20,4 @@ Thumbs.db
 .DS_Store
 
 # Frontend build output
-src/Bookmarks.Api/wwwroot/
+src/Starbook.Api/wwwroot/

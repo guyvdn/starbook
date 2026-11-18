@@ -1,4 +1,4 @@
-# Bookmarks — spec
+# Starbook — spec
 
 A self-hosted start page for bookmarks, split into **spaces** so each browser profile shows only its own
 subset. It replaces a Speed Dial 2 setup: its tab/tile model, plus spaces above and optional sections within a tab, and without the

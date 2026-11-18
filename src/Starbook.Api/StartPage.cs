@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 /// <summary>
 /// Serves the built <c>index.html</c> with the space's data embedded, so a new tab renders from one response.

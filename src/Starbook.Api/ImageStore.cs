@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 /// <summary>
 /// Content-addressed image files: <c>&lt;sha256&gt;.&lt;ext&gt;</c>. The format is sniffed from the bytes, never

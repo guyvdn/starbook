@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 /// <summary>Fills in an icon for every tile in a space that has none.</summary>
 public sealed class MissingIcons(SpaceStore store, IconFetcher icons)

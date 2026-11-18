@@ -1,4 +1,4 @@
-# Bookmarks
+# Starbook
 
 A fast, self-hosted bookmark start page, split into spaces so each browser profile gets its own subset.
 
@@ -8,9 +8,9 @@ See [docs/spec.md](docs/spec.md) for the design.
 
 | Path | What |
 |---|---|
-| `src/Bookmarks.Api` | ASP.NET Core minimal API, .NET 10, Native AOT. Serves the page, the API and the images. |
-| `web` | Plain TypeScript frontend, built by Vite into `src/Bookmarks.Api/wwwroot`. |
-| `tests/Bookmarks.Api.Tests` | xUnit v3 tests for storage and validation. |
+| `src/Starbook.Api` | ASP.NET Core minimal API, .NET 10, Native AOT. Serves the page, the API and the images. |
+| `web` | Plain TypeScript frontend, built by Vite into `src/Starbook.Api/wwwroot`. |
+| `tests/Starbook.Api.Tests` | xUnit v3 tests for storage and validation. |
 | `data` | Runtime data in development. Never committed. |
 
 ## Develop
@@ -18,7 +18,7 @@ See [docs/spec.md](docs/spec.md) for the design.
 Requires the .NET 10 SDK and Node.js 22+.
 
 ```sh
-dotnet run --project src/Bookmarks.Api   # API on http://localhost:5080, data in ./data
+dotnet run --project src/Starbook.Api   # API on http://localhost:5080, data in ./data
 cd web && npm install && npm run dev      # page on http://localhost:5173, proxies the API
 ```
 
@@ -35,7 +35,7 @@ dotnet test
 
 ```sh
 mkdir -p data && sudo chown 1654:1654 data   # the container runs as uid 1654
-BOOKMARKS_PORT=8080 docker compose up -d --build
+STARBOOK_PORT=8080 docker compose up -d --build
 ```
 
 - The app has **no login**. [compose.yml](compose.yml) publishes it on `127.0.0.1` only; put a private network

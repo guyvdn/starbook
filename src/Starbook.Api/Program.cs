@@ -1,4 +1,4 @@
-using Bookmarks.Api;
+using Starbook.Api;
 
 // Docker HEALTHCHECK: the runtime image has no shell or curl, so the binary probes itself.
 if (args is ["--healthcheck", ..])

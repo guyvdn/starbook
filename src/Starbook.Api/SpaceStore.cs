@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 public enum SaveStatus { Saved, NotFound, Conflict }
 

@@ -2,14 +2,14 @@ using System.Net;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Bookmarks.Api.Tests;
+namespace Starbook.Api.Tests;
 
 public sealed class IconFetcherTests : IDisposable
 {
     private static readonly byte[] Png = [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3];
     private static readonly byte[] Ico = [0, 0, 1, 0, 1, 0, 16, 16];
 
-    private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "bookmarks-tests", Guid.NewGuid().ToString("N"));
+    private readonly string _dataPath = Path.Combine(Path.GetTempPath(), "starbook-tests", Guid.NewGuid().ToString("N"));
     private readonly Dictionary<string, (string Type, byte[] Body)> _site = new();
     private readonly List<string> _requested = [];
 

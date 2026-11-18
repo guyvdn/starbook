@@ -5,7 +5,7 @@ const api = 'http://localhost:5080';
 
 export default defineConfig({
   build: {
-    outDir: '../src/Bookmarks.Api/wwwroot',
+    outDir: '../src/Starbook.Api/wwwroot',
     emptyOutDir: true,
   },
   server: {

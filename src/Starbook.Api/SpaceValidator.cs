@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Bookmarks.Api;
+namespace Starbook.Api;
 
 public static partial class SpaceValidator
 {
