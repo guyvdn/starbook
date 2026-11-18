@@ -32,4 +32,5 @@ COPY --from=api --chown=1654:1654 /data /data
 ENV DataPath=/data
 VOLUME /data
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["./Bookmarks.Api", "--healthcheck"]
 ENTRYPOINT ["./Bookmarks.Api"]

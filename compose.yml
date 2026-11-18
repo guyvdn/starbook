@@ -1,0 +1,10 @@
+# Example deployment. The app has no login: publish it on localhost only and put a private network
+# (e.g. `tailscale serve`) in front of it.
+services:
+  bookmarks:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${BOOKMARKS_PORT:-8080}:8080"
+    volumes:
+      - ./data:/data # must be writable by uid 1654

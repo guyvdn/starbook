@@ -34,11 +34,12 @@ dotnet test
 ## Run
 
 ```sh
-docker build -t bookmarks .
-docker run -d --name bookmarks -p 127.0.0.1:8080:8080 -v bookmarks-data:/data bookmarks
+mkdir -p data && sudo chown 1654:1654 data   # the container runs as uid 1654
+BOOKMARKS_PORT=8080 docker compose up -d --build
 ```
 
-- The app has **no login**. Only expose it on a private network, for example behind `tailscale serve`.
-- Everything the app stores is in `/data`; back that up.
-- The container runs as uid `1654`. A bind mount instead of a named volume must be writable by that uid
-  (`chown -R 1654:1654 <dir>`).
+- The app has **no login**. [compose.yml](compose.yml) publishes it on `127.0.0.1` only; put a private network
+  in front of it, for example `tailscale serve --bg --https=<port> http://127.0.0.1:<port>`.
+- Everything the app stores is in `data/`: JSON files and images, always written via temp file + rename, so a
+  plain file backup is consistent while the app runs.
+- The image has a healthcheck (`/healthz`: data folder loaded and writable).

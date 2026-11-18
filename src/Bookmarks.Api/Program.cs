@@ -1,5 +1,20 @@
 using Bookmarks.Api;
 
+// Docker HEALTHCHECK: the runtime image has no shell or curl, so the binary probes itself.
+if (args is ["--healthcheck", ..])
+{
+    var port = Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS")?.Split(';')[0] ?? "8080";
+    using var probe = new HttpClient { Timeout = TimeSpan.FromSeconds(3) };
+    try
+    {
+        return (await probe.GetAsync($"http://127.0.0.1:{port}/healthz")).IsSuccessStatusCode ? 0 : 1;
+    }
+    catch
+    {
+        return 1;
+    }
+}
+
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -37,6 +52,26 @@ app.UseStaticFiles(new StaticFileOptions
         if (ctx.Context.Request.Path.StartsWithSegments("/assets"))
             ctx.Context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
     },
+});
+
+// Healthy when the data folder loaded and is writable.
+app.MapGet("/healthz", (SpaceStore store) =>
+{
+    try
+    {
+        var probe = Path.Combine(dataPath, ".healthz");
+        File.WriteAllText(probe, "ok");
+        File.Delete(probe);
+    }
+    catch (IOException)
+    {
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+    return store.FirstSlug() is null ? Results.StatusCode(StatusCodes.Status503ServiceUnavailable) : Results.Text("ok");
 });
 
 app.MapGet("/", (SpaceStore store) => Results.Redirect($"/s/{store.FirstSlug()}"));
@@ -137,3 +172,4 @@ app.MapGet("/img/{name}", (string name, ImageStore images, HttpContext http) =>
 });
 
 app.Run();
+return 0;
