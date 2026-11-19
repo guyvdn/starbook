@@ -668,6 +668,11 @@ section.drop-after {
   width: 128px;
   flex: none;
   border-radius: 8px;
+  background: linear-gradient(145deg, var(--card-top), var(--card-bottom) 82%);
+}
+
+.thumb.preview img {
+  filter: drop-shadow(0 0 1px var(--icon-edge));
 }
 
 .image-actions {
@@ -707,7 +712,8 @@ section.drop-after {
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg);
+  /* Same backdrop and edge as a tile, so a light or dark logo is judged as it will be shown. */
+  background: linear-gradient(145deg, var(--card-top), var(--card-bottom) 82%);
   cursor: pointer;
 }
 
@@ -720,6 +726,7 @@ section.drop-after {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  filter: drop-shadow(0 0 1px var(--icon-edge));
 }
 
 .transfer,
