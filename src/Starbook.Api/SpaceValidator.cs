@@ -10,6 +10,15 @@ public static partial class SpaceValidator
     [GeneratedRegex(@"^[a-f0-9]{64}\.(?:png|jpg|gif|webp|svg|ico)$")]
     private static partial Regex ImagePattern();
 
+    /// <summary>The accent colours a space can have. Keep in step with <c>PALETTE</c> in <c>web/src/theme.ts</c>.</summary>
+    public static readonly IReadOnlyList<string> Colors =
+    [
+        "#ff0000", "#fc4444", "#fc6404", "#fcd444", "#8cc43c", "#029658",
+        "#1abc9c", "#5bc0de", "#2f64c1", "#6454ac", "#b178aa", "#f978aa",
+    ];
+
+    public static bool IsValidColor(string? color) => color is not null && Colors.Contains(color);
+
     public static bool IsValidSlug(string? slug) => slug is not null && SlugPattern().IsMatch(slug);
 
     public static bool IsValidImage(string? image) => image is not null && ImagePattern().IsMatch(image);
@@ -20,6 +29,7 @@ public static partial class SpaceValidator
         if (!IsValidSlug(space.Slug)) return "Invalid slug: use lowercase letters, digits and hyphens.";
         if (string.IsNullOrWhiteSpace(space.Name)) return "A space needs a name.";
         if (space.Tabs is null) return "Missing tabs.";
+        if (space.Color is not null && !IsValidColor(space.Color)) return "Unknown colour.";
 
         var ids = new HashSet<string>(StringComparer.Ordinal);
         string? Id(string? id, string what) =>

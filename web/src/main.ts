@@ -14,7 +14,9 @@ import {
   tabSlugs,
   tileCount,
 } from './model';
+import { openColorDialog } from './color-dialog';
 import { openImportDialog } from './import-dialog';
+import { applyTheme } from './theme';
 import { openTileDialog } from './tile-dialog';
 import type { Section, Space, SpaceSummary, StartPageData, Tab, Tile } from './types';
 
@@ -115,6 +117,7 @@ function isPlainClick(e: MouseEvent): boolean {
 function render(): void {
   syncAddress();
   document.title = space.name;
+  applyTheme(space.color);
   document.body.classList.toggle('editing', editing);
   byId('space-name').textContent = space.name;
   renderSpaces();
@@ -131,6 +134,7 @@ function renderSpaces(): void {
     others.length > 0 ? el('hr') : null,
     !editing ? el('button', { className: 'space', textContent: 'Edit', onclick: toggleEditing }) : null,
     editing ? el('button', { className: 'space', textContent: 'Rename this space…', onclick: renameSpace }) : null,
+    editing ? el('button', { className: 'space', textContent: 'Colour…', onclick: pickColor }) : null,
     editing ? el('button', { className: 'space', textContent: 'Fetch missing icons', onclick: fillMissingIcons }) : null,
     editing ? el('button', { className: 'space', textContent: 'New space…', onclick: createSpace }) : null,
     editing ? el('button', { className: 'space', textContent: 'Import from Speed Dial…', onclick: startImport }) : null,
@@ -444,6 +448,12 @@ function renameSpace(): void {
   if (!name || name === space.name) return;
   spaces = spaces.map((s) => (s.slug === space.slug ? { ...s, name } : s));
   commit((s) => (s.name = name));
+}
+
+function pickColor(): void {
+  openColorDialog(space.color, (color) => {
+    if (color !== (space.color ?? null)) commit((s) => (s.color = color));
+  });
 }
 
 async function createSpace(): Promise<void> {

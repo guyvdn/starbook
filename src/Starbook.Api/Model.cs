@@ -3,7 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace Starbook.Api;
 
-public sealed record Space(string Slug, string Name, int Version, List<Tab> Tabs);
+/// <param name="Color">One of <see cref="SpaceValidator.Colors"/>, or <c>null</c> for the default blue look.</param>
+public sealed record Space(
+    string Slug,
+    string Name,
+    int Version,
+    List<Tab> Tabs,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Color = null);
 
 public sealed record Tab(string Id, string Title, List<Section> Sections);
 

@@ -46,6 +46,19 @@ public sealed class SpaceStoreTests : IDisposable
     }
 
     [Fact]
+    public async Task Colour_is_saved_and_a_space_file_without_one_still_loads()
+    {
+        var store = await Open();
+        var space = store.Get("personal")!;
+        Assert.Null(space.Color);
+        Assert.DoesNotContain("color", await File.ReadAllTextAsync(Path.Combine(_dataPath, "spaces", "personal.json"), Ct));
+
+        await store.SaveAsync(space with { Color = "#029658" }, Ct);
+
+        Assert.Equal("#029658", (await Open()).Get("personal")!.Color);
+    }
+
+    [Fact]
     public async Task Save_based_on_a_stale_version_is_rejected_with_the_current_space()
     {
         var store = await Open();

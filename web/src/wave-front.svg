@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" preserveAspectRatio="none">
   <defs>
     <linearGradient id="sheet" x1="0" y1="220" x2="0" y2="480" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0a8cff" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#0a8cff" stop-opacity="0"/>
+      <stop offset="0" stop-color="#fff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
     <filter id="glow" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="16"/></filter>
   </defs>
   <path d="M-1600 330 C-1420 330 -1380 230 -1200 230 S-980 310 -800 310 S-580 260 -400 260 S-180 330 0 330 S220 230 400 230 S620 310 800 310 S1020 260 1200 260 S1420 330 1600 330 S1820 230 2000 230 S2220 310 2400 310 S2620 260 2800 260 S3020 330 3200 330 L3200 480 L-1600 480 Z" fill="url(#sheet)"/>
-  <path d="M-1600 330 C-1420 330 -1380 230 -1200 230 S-980 310 -800 310 S-580 260 -400 260 S-180 330 0 330 S220 230 400 230 S620 310 800 310 S1020 260 1200 260 S1420 330 1600 330 S1820 230 2000 230 S2220 310 2400 310 S2620 260 2800 260 S3020 330 3200 330" fill="none" stroke="#02bdff" stroke-width="22" opacity="0.35" filter="url(#glow)"/>
-  <path d="M-1600 330 C-1420 330 -1380 230 -1200 230 S-980 310 -800 310 S-580 260 -400 260 S-180 330 0 330 S220 230 400 230 S620 310 800 310 S1020 260 1200 260 S1420 330 1600 330 S1820 230 2000 230 S2220 310 2400 310 S2620 260 2800 260 S3020 330 3200 330" fill="none" stroke="#3fe3ff" stroke-width="2.6" opacity="0.8"/>
+  <path d="M-1600 330 C-1420 330 -1380 230 -1200 230 S-980 310 -800 310 S-580 260 -400 260 S-180 330 0 330 S220 230 400 230 S620 310 800 310 S1020 260 1200 260 S1420 330 1600 330 S1820 230 2000 230 S2220 310 2400 310 S2620 260 2800 260 S3020 330 3200 330" fill="none" stroke="#fff" stroke-width="22" opacity="0.35" filter="url(#glow)"/>
+  <path d="M-1600 330 C-1420 330 -1380 230 -1200 230 S-980 310 -800 310 S-580 260 -400 260 S-180 330 0 330 S220 230 400 230 S620 310 800 310 S1020 260 1200 260 S1420 330 1600 330 S1820 230 2000 230 S2220 310 2400 310 S2620 260 2800 260 S3020 330 3200 330" fill="none" stroke="#fff" stroke-width="2.6" opacity="0.8"/>
 </svg>

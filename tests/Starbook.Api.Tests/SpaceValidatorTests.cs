@@ -6,6 +6,21 @@ public sealed class SpaceValidatorTests
         new("personal", "Personal", 1, [new Tab("b_1", "Home", [new Section("s_1", null, [.. tiles])])]);
 
     [Fact]
+    public void A_palette_colour_or_none_is_valid()
+    {
+        Assert.Null(SpaceValidator.Validate(Valid() with { Color = "#fc6404" }));
+        Assert.Null(SpaceValidator.Validate(Valid() with { Color = null }));
+    }
+
+    [Theory]
+    [InlineData("#FC6404")]
+    [InlineData("#123456")]
+    [InlineData("red")]
+    [InlineData("")]
+    public void A_colour_outside_the_palette_is_rejected(string color) =>
+        Assert.Equal("Unknown colour.", SpaceValidator.Validate(Valid() with { Color = color }));
+
+    [Fact]
     public void Valid_space_passes() =>
         Assert.Null(SpaceValidator.Validate(Valid(new Tile("t_1", "Example", "https://example.com/", null))));
 

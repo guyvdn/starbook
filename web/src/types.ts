@@ -24,6 +24,8 @@ export interface Space {
   name: string;
   version: number;
   tabs: Tab[];
+  /** One of PALETTE (theme.ts); absent for the default look. */
+  color?: string | null;
 }
 
 export interface SpaceSummary {

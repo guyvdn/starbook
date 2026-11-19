@@ -33,7 +33,7 @@ erDiagram
 
 | Entity | Fields | Notes |
 |---|---|---|
-| Space | `slug`, `name`, `version`, `tabs[]` | One JSON file per space. `slug` is the URL segment. One per browser profile. |
+| Space | `slug`, `name`, `version`, `tabs[]`, `color?` | One JSON file per space. `slug` is the URL segment. One per browser profile. `color` is one of 12 palette hexes (`SpaceValidator.Colors`, `web/src/theme.ts`); absent means the default blue. |
 | Tab | `id`, `title`, `sections[]` | One tab visible at a time. |
 | Section | `id`, `title`, `tiles[]` | A titled block of tiles within a tab. `title` may be `null`. |
 | Tile | `id`, `title`, `url`, `image` | `image` is an image reference or `null`. |
@@ -163,6 +163,10 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
   gradient cards with a 52px logo on top and the title inside, under it; dark logos get a faint light edge so
   they stay visible. A hovered tile lifts and its border turns cyan. A tile without an image shows a letter
   badge in one of seven accents per site.
+- A space can have a colour (edit mode, space menu, "Colour…"; 12 swatches plus the default). It sets one CSS
+  variable, `--accent`, and `:root[data-themed]` in `style.css` derives the backgrounds, cards, borders, waves and
+  the text colour on filled buttons from it. The start page sets it in the `<head>` before first paint, so a
+  themed space never flashes the default colours.
 
 - The space name, top left, is also the space switcher. The other spaces are listed only when it is opened,
   so they stay out of sight while sharing a screen with one customer.
