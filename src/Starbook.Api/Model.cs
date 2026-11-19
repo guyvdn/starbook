@@ -35,6 +35,7 @@ public sealed record ImageResponse(string Image);
 [JsonSerializable(typeof(IconRequest))]
 [JsonSerializable(typeof(IconResult))]
 [JsonSerializable(typeof(IReadOnlyList<SpaceSummary>))]
+[JsonSerializable(typeof(IReadOnlyList<LogoHit>))]
 internal partial class AppJsonContext : JsonSerializerContext;
 
 /// <summary>Indented variant for the files on disk, so they stay readable and diffable.</summary>

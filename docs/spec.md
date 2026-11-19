@@ -133,8 +133,17 @@ bookmarked.
   `apple-touch-icon`, the web app manifest (skipping maskable/monochrome icons) and `/favicon.ico`. An SVG
   wins, then the largest bitmap; the first candidate that downloads as a real image is kept. The page title
   is returned too and fills an empty tile title. If nothing usable is found the tile shows a letter tile.
+- **Sign-in redirects are ignored.** Signed out, many sites bounce to an identity provider on another host
+  (`calendar.google.com` to `accounts.google.com`). That page's icon and title belong to the provider, so
+  the fetch drops it and only tries `/favicon.ico` on the requested host. The tile gets a letter tile
+  instead of a wrong logo; upload a custom image for these.
 - The image format is sniffed from the bytes (PNG, JPEG, GIF, WebP, ICO, SVG); file names and Content-Type
   headers are not trusted.
+- **Search logos** in the tile dialog, for when the fetched icon is wrong or missing. The server queries the
+  Iconify API, limited to the open-licensed brand sets SVG Logos, theSVG and selfh.st icons: vector, transparent
+  background, brand colours. The query is prefilled from the title or host, and the user picks a result, which
+  is stored like an upload. Only the typed query leaves the server, never the bookmarked URL. Previews and the
+  picked SVG go through `GET /api/logos` and `GET /api/logos/svg`, which validate the id and cap the size.
 - **Custom image** per tile, by upload or paste, overrides the fetched one. This is how several tiles for the
   same site are told apart.
 - **Re-fetch** on demand per tile.

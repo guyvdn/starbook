@@ -26,7 +26,13 @@ public sealed partial class IconFetcher(HttpClient http, ImageStore images, ILog
         {
             using var response = await http.GetAsync(page, HttpCompletionOption.ResponseHeadersRead, ct);
             baseUri = response.RequestMessage?.RequestUri ?? page; // after redirects
-            if (response.IsSuccessStatusCode && response.Content.Headers.ContentType?.MediaType is "text/html" or null)
+            if (IsLoginWall(page, baseUri))
+            {
+                // Signed out, the site bounces to its identity provider, whose icon and title are not the site's.
+                log.LogInformation("{Url} redirects to a sign-in page ({Final}); ignoring it", page, baseUri);
+                baseUri = page;
+            }
+            else if (response.IsSuccessStatusCode && response.Content.Headers.ContentType?.MediaType is "text/html" or null)
                 html = Encoding.UTF8.GetString(await ReadCappedAsync(response, MaxPageBytes, ct) ?? []);
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
@@ -44,6 +50,23 @@ public sealed partial class IconFetcher(HttpClient http, ImageStore images, ILog
         }
 
         return new IconResult(null, html is null ? null : TitleOf(html));
+    }
+
+    private static readonly string[] LoginHosts = ["accounts", "login", "signin", "auth", "sso", "id", "idp", "secure"];
+    private static readonly string[] LoginPaths = ["login", "signin", "sign-in", "sso", "oauth", "authorize"];
+
+    /// <summary>
+    /// True when a redirect moved to a different host that looks like a sign-in page, such as
+    /// <c>calendar.google.com</c> to <c>accounts.google.com</c>. A plain <c>www.</c> or path change is not one.
+    /// </summary>
+    public static bool IsLoginWall(Uri requested, Uri final)
+    {
+        static string Bare(Uri u) => u.Host.StartsWith("www.", StringComparison.OrdinalIgnoreCase) ? u.Host[4..] : u.Host;
+        if (string.Equals(Bare(requested), Bare(final), StringComparison.OrdinalIgnoreCase)) return false;
+
+        var firstLabel = final.Host.Split('.')[0];
+        return LoginHosts.Contains(firstLabel, StringComparer.OrdinalIgnoreCase)
+               || LoginPaths.Any(p => final.AbsolutePath.Contains(p, StringComparison.OrdinalIgnoreCase));
     }
 
     private sealed record Candidate(Uri Url, int Score);

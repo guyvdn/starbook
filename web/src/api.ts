@@ -60,6 +60,9 @@ export const api = {
   lookupIcon: async (url: string) =>
     json<IconResult>(await fetch('/api/icons', { method: 'POST', headers: jsonHeaders, body: JSON.stringify({ url }) })),
 
+  searchLogos: async (query: string) =>
+    (await json<{ id: string }[]>(await fetch(`/api/logos?q=${encodeURIComponent(query)}`))).map((l) => l.id),
+
   uploadImage: async (image: Blob) =>
     (await json<{ image: string }>(await fetch('/api/images', { method: 'POST', body: image }))).image,
 };

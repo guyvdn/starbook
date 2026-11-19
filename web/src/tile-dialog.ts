@@ -30,6 +30,19 @@ export function openTileDialog(options: TileDialogOptions): void {
   const preview = el('span', { className: 'thumb preview' });
   const file = el('input', { type: 'file', accept: 'image/*', hidden: true });
   const status = el('span', { className: 'muted' });
+  const logoQuery = el('input', { type: 'text', placeholder: 'Search logos…', autocomplete: 'off' });
+  const logoGrid = el('div', { className: 'logo-grid' });
+  const logoPanel = el(
+    'div',
+    { className: 'logo-search', hidden: true },
+    el(
+      'div',
+      { className: 'logo-query' },
+      logoQuery,
+      el('button', { type: 'button', textContent: 'Search', onclick: () => void searchLogos() }),
+    ),
+    logoGrid,
+  );
 
   function showImage(): void {
     preview.replaceChildren(image ? el('img', { src: `/img/${image}`, alt: '' }) : el('span', { className: 'muted', textContent: 'No image' }));
@@ -56,6 +69,54 @@ export function openTileDialog(options: TileDialogOptions): void {
       .finally(() => (lookup = null));
   }
 
+  function openLogoSearch(): void {
+    logoPanel.hidden = false;
+    if (!logoQuery.value.trim()) {
+      let host = '';
+      try {
+        host = new URL(normalizeUrl(url.value)).hostname.replace(/^www\./, '');
+      } catch {
+        /* the URL is not typed yet */
+      }
+      logoQuery.value = title.value.trim() || host;
+    }
+    logoQuery.focus();
+    if (logoQuery.value.trim()) void searchLogos();
+  }
+
+  async function searchLogos(): Promise<void> {
+    const query = logoQuery.value.trim();
+    if (!query) return;
+    logoGrid.replaceChildren(el('span', { className: 'muted', textContent: 'Searching…' }));
+    try {
+      const ids = await api.searchLogos(query);
+      logoGrid.replaceChildren(
+        ...(ids.length
+          ? ids.map((id) =>
+              el(
+                'button',
+                { type: 'button', className: 'logo-choice', title: id.replace(':', ' · '), onclick: () => void pickLogo(id) },
+                el('img', { src: `/api/logos/svg?id=${encodeURIComponent(id)}`, alt: id, loading: 'lazy' }),
+              ),
+            )
+          : [el('span', { className: 'muted', textContent: 'No logos found. Try another name.' })]),
+      );
+    } catch (e) {
+      logoGrid.replaceChildren(el('span', { className: 'muted', textContent: e instanceof Error ? e.message : String(e) }));
+    }
+  }
+
+  async function pickLogo(id: string): Promise<void> {
+    try {
+      const response = await fetch(`/api/logos/svg?id=${encodeURIComponent(id)}`);
+      if (!response.ok) throw new Error('Could not download that logo.');
+      await useImage(await response.blob());
+      logoPanel.hidden = true;
+    } catch (e) {
+      status.textContent = e instanceof Error ? e.message : String(e);
+    }
+  }
+
   async function useImage(blob: Blob): Promise<void> {
     status.textContent = 'Uploading…';
     try {
@@ -70,6 +131,12 @@ export function openTileDialog(options: TileDialogOptions): void {
 
   url.addEventListener('change', () => fetchIcon(false));
   title.addEventListener('input', () => (titleTouched = true));
+  logoQuery.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // would submit the tile form
+      void searchLogos();
+    }
+  });
   file.addEventListener('change', () => file.files?.[0] && void useImage(file.files[0]));
 
   const sectionSelect = el(
@@ -100,6 +167,7 @@ export function openTileDialog(options: TileDialogOptions): void {
         'div',
         { className: 'image-actions' },
         el('button', { type: 'button', textContent: 'Fetch icon', onclick: () => fetchIcon(true) }),
+        el('button', { type: 'button', textContent: 'Search logos…', onclick: openLogoSearch }),
         el('button', { type: 'button', textContent: 'Upload…', onclick: () => file.click() }),
         el('button', {
           type: 'button',
@@ -114,6 +182,7 @@ export function openTileDialog(options: TileDialogOptions): void {
       ),
       file,
     ),
+    logoPanel,
     status,
     tile && options.onTransfer && options.otherSpaces.length > 0
       ? el(

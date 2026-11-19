@@ -18,7 +18,9 @@ public sealed class IconFetcherTests : IDisposable
         if (Directory.Exists(_dataPath)) Directory.Delete(_dataPath, recursive: true);
     }
 
-    private IconFetcher Fetcher() => new(new HttpClient(new FakeSite(_site, _requested)), new ImageStore(_dataPath),
+    private readonly Dictionary<string, string> _redirects = new();
+
+    private IconFetcher Fetcher() => new(new HttpClient(new FakeSite(_site, _requested, _redirects)), new ImageStore(_dataPath),
         NullLogger<IconFetcher>.Instance);
 
     private void Page(string html) => _site["https://example.com/"] = ("text/html", Encoding.UTF8.GetBytes(html));
@@ -82,6 +84,31 @@ public sealed class IconFetcherTests : IDisposable
         Assert.Equal(new IconResult(null, null), result);
     }
 
+    [Fact]
+    public async Task Ignores_the_icon_and_title_of_a_sign_in_redirect()
+    {
+        _redirects["https://calendar.example.com/"] = "https://accounts.example.com/signin";
+        _site["https://accounts.example.com/signin"] = ("text/html", Encoding.UTF8.GetBytes(
+            """<title>Sign in</title><link rel="icon" href="/g.png">"""));
+        _site["https://accounts.example.com/g.png"] = ("image/png", Png);
+        _site["https://accounts.example.com/favicon.ico"] = ("image/x-icon", Ico);
+
+        var result = await Fetcher().FetchAsync(new Uri("https://calendar.example.com/"), Ct);
+
+        Assert.Equal(new IconResult(null, null), result);
+        Assert.DoesNotContain(_requested, u => u.Contains("accounts.example.com/g.png"));
+    }
+
+    [Theory]
+    [InlineData("https://calendar.google.com/", "https://accounts.google.com/v3/signin/identifier", true)]
+    [InlineData("https://app.example.com/", "https://login.microsoftonline.com/common/oauth2/authorize", true)]
+    [InlineData("https://example.com/", "https://www.example.com/", false)]
+    [InlineData("https://example.com/", "https://example.com/en/home", false)]
+    [InlineData("https://docs.example.com/", "https://example.com/docs", false)]
+    [InlineData("https://example.com/login", "https://example.com/login", false)]
+    public void Recognises_sign_in_redirects(string requested, string final, bool expected) =>
+        Assert.Equal(expected, IconFetcher.IsLoginWall(new Uri(requested), new Uri(final)));
+
     [Theory]
     [InlineData(new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }, "jpg")]
     [InlineData(new byte[] { 0, 0, 1, 0, 1, 0 }, "ico")]
@@ -93,13 +120,18 @@ public sealed class IconFetcherTests : IDisposable
     public void Sniffs_svg_after_an_xml_declaration() =>
         Assert.Equal("svg", ImageStore.Sniff("""<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg"/>"""u8));
 
-    private sealed class FakeSite(Dictionary<string, (string Type, byte[] Body)> site, List<string> requested)
-        : HttpMessageHandler
+    private sealed class FakeSite(Dictionary<string, (string Type, byte[] Body)> site, List<string> requested,
+        Dictionary<string, string> redirects) : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             var url = request.RequestUri!.ToString();
             requested.Add(url);
+            if (redirects.TryGetValue(url, out var target))
+            {
+                url = target;
+                request = new HttpRequestMessage(HttpMethod.Get, target);
+            }
             if (!site.TryGetValue(url, out var page))
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound) { RequestMessage = request });
 

@@ -40,6 +40,8 @@ builder.Services.AddHttpClient<IconFetcher>(client =>
         ConnectTimeout = TimeSpan.FromSeconds(5),
     });
 
+builder.Services.AddHttpClient<LogoSearch>(client => client.Timeout = TimeSpan.FromSeconds(8));
+
 var app = builder.Build();
 
 app.Logger.LogInformation("Data path: {DataPath}", dataPath);
@@ -142,6 +144,20 @@ app.MapPost("/api/icons", async (IconRequest request, IconFetcher icons, HttpCon
     {
         return Results.Ok(new IconResult(null, null));
     }
+});
+
+app.MapGet("/api/logos", async (string? q, LogoSearch logos, CancellationToken ct) =>
+    Results.Ok(await logos.SearchAsync(q ?? "", ct)));
+
+app.MapGet("/api/logos/svg", async (string id, LogoSearch logos, HttpContext http, CancellationToken ct) =>
+{
+    if (await logos.GetSvgAsync(id, ct) is not { } svg) return Results.NotFound();
+
+    var headers = http.Response.Headers;
+    headers.CacheControl = "public, max-age=86400";
+    headers.XContentTypeOptions = "nosniff";
+    headers.ContentSecurityPolicy = "default-src 'none'; style-src 'unsafe-inline'; sandbox";
+    return Results.Bytes(svg, "image/svg+xml");
 });
 
 // The body is the image itself (upload or paste); its format is sniffed, so the Content-Type does not matter.
