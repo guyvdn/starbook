@@ -222,7 +222,7 @@ main {
   position: relative;
   z-index: 1;
   width: min(1440px, calc(100% - clamp(48px, 12vw, 192px)));
-  margin: 20px 0 64px clamp(24px, 8.75vw, 150px);
+  margin: 20px auto 64px;
 }
 
 section + section {
