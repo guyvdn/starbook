@@ -499,7 +499,6 @@ button.icon:hover {
 }
 
 .tile.add {
-  min-height: 100px;
   place-content: center;
   font-size: 28px;
   color: var(--dim);
