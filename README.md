@@ -43,3 +43,13 @@ STARBOOK_PORT=8080 docker compose up -d --build
 - Everything the app stores is in `data/`: JSON files and images, always written via temp file + rename, so a
   plain file backup is consistent while the app runs.
 - The image has a healthcheck (`/healthz`: data folder loaded and writable).
+
+## Open Starbook on every new tab
+
+Chrome and Edge don't let you set a custom new tab page in their settings, so use an extension. Our
+recommendation: **[New Tab Override – Simple and Light](https://chromewebstore.google.com/detail/new-tab-override-simple-a/jpafcbbaaegimoffpmkadpmjljlpllkc)**.
+Its listing says it asks only for the `storage` permission and no host permissions, so it can't read your
+browsing data. Install it, then set its URL to your Starbook space.
+
+In Edge, first enable **Allow extensions from other stores** at `edge://extensions`, then confirm the override
+when you open a new tab.
