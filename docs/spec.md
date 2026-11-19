@@ -148,7 +148,7 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 
 ## Start page
 
-- Midnight Blue / Cyan theme, dark only: deep navy with a glowing blue wave fixed along the bottom, edge to edge. The
+- Midnight Blue / Cyan theme, dark only: deep navy with glowing blue waves along the bottom, edge to edge, drifting slowly (two transform-only layers, still under reduced motion). The
   header holds the bold space name, a short divider, then the tabs as plain text; the active tab is white and
   bold with a glowing cyan underline. Section headings are bold and cyan. Tiles are fixed-size (132 x 110)
   gradient cards with a 52px logo on top and the title inside, under it; dark logos get a faint light edge so
