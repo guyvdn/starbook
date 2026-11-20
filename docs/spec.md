@@ -171,6 +171,11 @@ timeout, a response size cap, and an image content-type check. Fetching LAN addr
 - The space name, top left, is also the space switcher. The other spaces are listed only when it is opened,
   so they stay out of sight while sharing a screen with one customer.
 - Tabs sit next to it; the active tab is in the path, `/spaces/personal/tools`, derived from the tab title (`-2`, `-3` for duplicate titles). Renaming a tab changes its address. Switching tabs is in-page (`pushState`), so Back returns to the previous tab.
+- A search box at the right of the header finds a bookmark by name across **every tab** of the space. It matches
+  the title and the host, accent- and case-insensitive, every word of the query must match, and a title that
+  starts with the query ranks first. Results show the logo, title and `Tab › Section`; Up/Down select, Enter opens
+  (Ctrl/Cmd+Enter in a new tab), Escape clears, and `/` focuses the box from anywhere. It runs in the browser on the
+  space already loaded, so it needs no endpoint. In edit mode a result opens the tile's dialog instead.
 
 ## Editing
 

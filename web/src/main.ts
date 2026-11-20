@@ -16,6 +16,7 @@ import {
 } from './model';
 import { openColorDialog } from './color-dialog';
 import { openImportDialog } from './import-dialog';
+import { wireSearch } from './search';
 import { applyTheme } from './theme';
 import { openTileDialog } from './tile-dialog';
 import type { Section, Space, SpaceSummary, StartPageData, Tab, Tile } from './types';
@@ -565,5 +566,6 @@ if (data) {
     render();
   });
   wireSwitcher();
+  wireSearch({ getSpace: () => space, isEditing: () => editing, editTile });
   render();
 }
